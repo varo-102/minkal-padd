@@ -1,0 +1,79 @@
+import { Buffer } from "buffer";
+import { Client as ContractClient, Spec as ContractSpec, } from "@stellar/stellar-sdk/contract";
+export * from "@stellar/stellar-sdk";
+export * as contract from "@stellar/stellar-sdk/contract";
+export * as rpc from "@stellar/stellar-sdk/rpc";
+if (typeof window !== "undefined") {
+    //@ts-ignore Buffer exists
+    window.Buffer = window.Buffer || Buffer;
+}
+export const networks = {
+    testnet: {
+        networkPassphrase: "Test SDF Network ; September 2015",
+        contractId: "CAREO7IJLLZOPDMSKDHR7DKLLO4TTTZHTK6OJOSO6OJCKQYGUBAYJDUJ",
+    }
+};
+export var BatchStatus;
+(function (BatchStatus) {
+    BatchStatus[BatchStatus["OpenForFunding"] = 0] = "OpenForFunding";
+    BatchStatus[BatchStatus["MoqReachedPendingBroker"] = 1] = "MoqReachedPendingBroker";
+    BatchStatus[BatchStatus["FundedAndBondedLocked"] = 2] = "FundedAndBondedLocked";
+    BatchStatus[BatchStatus["ShippedFromOrigin"] = 3] = "ShippedFromOrigin";
+    BatchStatus[BatchStatus["CustomsClearedBo"] = 4] = "CustomsClearedBo";
+    BatchStatus[BatchStatus["DeliveredCompleted"] = 5] = "DeliveredCompleted";
+    BatchStatus[BatchStatus["ExpiredRefundable"] = 6] = "ExpiredRefundable";
+    BatchStatus[BatchStatus["SlashedCancelled"] = 7] = "SlashedCancelled";
+    BatchStatus[BatchStatus["DomesticDispatchedBo"] = 8] = "DomesticDispatchedBo";
+})(BatchStatus || (BatchStatus = {}));
+export class Client extends ContractClient {
+    options;
+    static async deploy(
+    /** Options for initializing a Client as well as for calling a method, with extras specific to deploying. */
+    options) {
+        return ContractClient.deploy(null, options);
+    }
+    constructor(options) {
+        super(new ContractSpec(["AAAAAAAAAAAAAAAJZ2V0X2JhdGNoAAAAAAAAAQAAAAAAAAAIYmF0Y2hfaWQAAAAGAAAAAQAAA+gAAAfQAAAAC0JhdGNoRXNjcm93AA==",
+            "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABgAAAAAAAAAAAAAAC0FkbWluT3JhY2xlAAAAAAAAAAAAAAAAFFBsYXRmb3JtRmVlUmVjaXBpZW50AAAAAAAAAAAAAAAOUGxhdGZvcm1GZWVCcHMAAAAAAAEAAAAAAAAABUJhdGNoAAAAAAAAAQAAAAYAAAABAAAAAAAAAAhCdXllclBvcwAAAAIAAAAGAAAAEwAAAAEAAAAAAAAADUJyb2tlclByb2ZpbGUAAAAAAAABAAAAEw==",
+            "AAAAAAAAAEowLiBJbmljaWFsaXphY2nDs24gZGUgcGFyw6FtZXRyb3MgZ2xvYmFsZXMgZGVsIGNvbnRyYXRvIChJbnN0YW5jZSBTdG9yYWdlKQAAAAAACmluaXRpYWxpemUAAAAAAAMAAAAAAAAABm9yYWNsZQAAAAAAEwAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAAAAAAAAB2ZlZV9icHMAAAAABAAAAAA=",
+            "AAAAAAAAAEM3LiBQZW5hbGl6YWNpw7NuIGFsIERlc3BhY2hhbnRlIHBvciBpbmN1bXBsaW1pZW50byBncmF2ZSAoU2xhc2hpbmcpAAAAAAxzbGFzaF9icm9rZXIAAAABAAAAAAAAAAhiYXRjaF9pZAAAAAYAAAAA",
+            "AAAAAAAAAAAAAAANZ2V0X2J1eWVyX3BvcwAAAAAAAAIAAAAAAAAACGJhdGNoX2lkAAAABgAAAAAAAAAFYnV5ZXIAAAAAAAATAAAAAQAAA+gAAAfQAAAADUJ1eWVyUG9zaXRpb24AAAA=",
+            "AAAAAQAAAAAAAAAAAAAAC0JhdGNoRXNjcm93AAAAABMAAAAAAAAADGFuY2hvcl9idXllcgAAABMAAAAAAAAACGJhdGNoX2lkAAAABgAAAAAAAAALYmxfZG9jX2hhc2gAAAAD7gAAACAAAAAAAAAABmJyb2tlcgAAAAAD6AAAABMAAAAAAAAAEmJyb2tlcl9ib25kX2xvY2tlZAAAAAAACwAAAAAAAAAUYnJva2VyX2JvbmRfcmVxdWlyZWQAAAALAAAAAAAAAAtidXllcl9jb3VudAAAAAAEAAAAAAAAABBjb2xsZWN0ZWRfYW1vdW50AAAACwAAAAAAAAAPY29tbWl0dGVkX3VuaXRzAAAAAAQAAAAAAAAAD2NvbmZpcm1lZF91bml0cwAAAAAEAAAAAAAAAAxkaW1fZG9jX2hhc2gAAAPuAAAAIAAAAAAAAAAQZnVuZGluZ19kZWFkbGluZQAAAAYAAAAAAAAAC2lzX2RvbWVzdGljAAAAAAEAAAAAAAAAD21vcV90b3RhbF91bml0cwAAAAAEAAAAAAAAAAZzdGF0dXMAAAAAB9AAAAALQmF0Y2hTdGF0dXMAAAAAAAAAAA1zdWJzaWR5X2JvbnVzAAAAAAAACwAAAAAAAAANdGFyZ2V0X2Ftb3VudAAAAAAAAAsAAAAAAAAABXRva2VuAAAAAAAAEwAAAAAAAAAKdW5pdF9wcmljZQAAAAAACw==",
+            "AAAAAwAAAAAAAAAAAAAAC0JhdGNoU3RhdHVzAAAAAAkAAAAAAAAADk9wZW5Gb3JGdW5kaW5nAAAAAAAAAAAAAAAAABdNb3FSZWFjaGVkUGVuZGluZ0Jyb2tlcgAAAAABAAAAAAAAABVGdW5kZWRBbmRCb25kZWRMb2NrZWQAAAAAAAACAAAAAAAAABFTaGlwcGVkRnJvbU9yaWdpbgAAAAAAAAMAAAAAAAAAEEN1c3RvbXNDbGVhcmVkQm8AAAAEAAAAAAAAABJEZWxpdmVyZWRDb21wbGV0ZWQAAAAAAAUAAAAAAAAAEUV4cGlyZWRSZWZ1bmRhYmxlAAAAAAAABgAAAAAAAAAQU2xhc2hlZENhbmNlbGxlZAAAAAcAAAAAAAAAFERvbWVzdGljRGlzcGF0Y2hlZEJvAAAACA==",
+            "AAAAAQAAAAAAAAAAAAAAC0Jyb2tlclN0YXRzAAAAAAMAAAAAAAAAEWNvbXBsZXRlZF9iYXRjaGVzAAAAAAAABAAAAAAAAAAPc2xhc2hlZF9iYXRjaGVzAAAAAAQAAAAAAAAAEXRvdGFsX3ZvbHVtZV91c2RjAAAAAAAACw==",
+            "AAAAAAAAAFIyLiBPdHJvcyBpbXBvcnRhZG9yZXMgc2UgdW5lbiBhbCBsb3RlIGFiaWVydG8gY3VicmllbmRvIHVuaWRhZGVzIHJlc3RhbnRlcyBkZWwgTU9RAAAAAAAPam9pbl9vcGVuX2JhdGNoAAAAAAMAAAAAAAAACGJhdGNoX2lkAAAABgAAAAAAAAAFYnV5ZXIAAAAAAAATAAAAAAAAAAx1bml0c190b19idXkAAAAEAAAAAA==",
+            "AAAAAQAAAAAAAAAAAAAADUJ1eWVyUG9zaXRpb24AAAAAAAAEAAAAAAAAABBhbW91bnRfZGVwb3NpdGVkAAAACwAAAAAAAAASY29uZmlybWVkX2RlbGl2ZXJ5AAAAAAABAAAAAAAAAAhyZWZ1bmRlZAAAAAEAAAAAAAAABXVuaXRzAAAAAAAABA==",
+            "AAAAAAAAAGA2LiBIaXRvIEZpbmFsOiBDb25maXJtYWNpw7NuIGRlIGVudHJlZ2EgcG9uZGVyYWRhIHBvciB1bmlkYWRlcywgRmVlIFNwbGl0IGF0w7NtaWNvIHkgcmVwdXRhY2nDs24AAAAQY29uZmlybV9kZWxpdmVyeQAAAAIAAAAAAAAACGJhdGNoX2lkAAAABgAAAAAAAAAFYnV5ZXIAAAAAAAATAAAAAA==",
+            "AAAAAAAAAAAAAAAQZ2V0X2FkbWluX29yYWNsZQAAAAAAAAABAAAD6AAAABM=",
+            "AAAAAAAAAE4zQi4gRWwgRGVzcGFjaGFudGUgbyBQcm92ZWVkb3IgYWRqdWRpY2FkbyBkZXBvc2l0YSBzdSBjb2xhdGVyYWwgKEJvbmQpIGVuIFVTREMAAAAAABBsb2NrX2Jyb2tlcl9ib25kAAAAAgAAAAAAAAAIYmF0Y2hfaWQAAAAGAAAAAAAAAAZicm9rZXIAAAAAABMAAAAA",
+            "AAAAAAAAAFwxLiBFbCBJbXBvcnRhZG9yIEFuY2xhIGxhbnphIGVsIGxvdGUgeSBkZXBvc2l0YSBzdSBjdW90YSBpbmljaWFsIGVuIFVTREMgKENvbXByb21pc28gRMOtYSAxKQAAABFjcmVhdGVfb3Blbl9iYXRjaAAAAAAAAAgAAAAAAAAACGJhdGNoX2lkAAAABgAAAAAAAAAMYW5jaG9yX2J1eWVyAAAAEwAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAAAAAAp1bml0X3ByaWNlAAAAAAALAAAAAAAAAA9tb3FfdG90YWxfdW5pdHMAAAAABAAAAAAAAAAMYW5jaG9yX3VuaXRzAAAABAAAAAAAAAAQZnVuZGluZ19kZWFkbGluZQAAAAYAAAAAAAAAC2lzX2RvbWVzdGljAAAAAAEAAAAA",
+            "AAAAAAAAAAAAAAASZ2V0X2Jyb2tlcl9wcm9maWxlAAAAAAABAAAAAAAAAAZicm9rZXIAAAAAABMAAAABAAAD6AAAB9AAAAALQnJva2VyU3RhdHMA",
+            "AAAAAAAAAFgyQi4gUmVlbWJvbHNvIHNpbiBwZXJtaXNvIChQZXJtaXNzaW9ubGVzcyBSZWZ1bmQpIHNpIGVsIGxvdGUgZXhwaXJhIHNpbiBjb21wbGV0YXIgZWwgTU9RAAAAFGNsYWltX2V4cGlyZWRfcmVmdW5kAAAAAgAAAAAAAAAIYmF0Y2hfaWQAAAAGAAAAAAAAAAVidXllcgAAAAAAABMAAAAA",
+            "AAAAAAAAAAAAAAAUZ2V0X3BsYXRmb3JtX2ZlZV9icHMAAAAAAAAAAQAAAAQ=",
+            "AAAAAAAAAFozQS4gQXNpZ25hY2nDs24gZGUgbGEgQWdlbmNpYSBEZXNwYWNoYW50ZSBnYW5hZG9yYSBkZSBsYSBsaWNpdGFjacOzbiB5IHN1IGZpYW56YSByZXF1ZXJpZGEAAAAAABZhc3NpZ25fYnJva2VyX2FuZF9ib25kAAAAAAADAAAAAAAAAAhiYXRjaF9pZAAAAAYAAAAAAAAABmJyb2tlcgAAAAAAEwAAAAAAAAANYm9uZF9yZXF1aXJlZAAAAAAAAAsAAAAA",
+            "AAAAAAAAAF00Qi4gSGl0byAxIChOYWNpb25hbCk6IERlc3BhY2hvIGRlIEbDoWJyaWNhIGNvbiBGYWN0dXJhIEZpc2NhbCBTSU4geSBHdcOtYSBkZSBSZW1pc2nDs24gKDcwJSkAAAAAAAAYdmVyaWZ5X2RvbWVzdGljX2Rpc3BhdGNoAAAAAgAAAAAAAAAIYmF0Y2hfaWQAAAAGAAAAAAAAABhpbnZvaWNlX2FuZF93YXliaWxsX2hhc2gAAAPuAAAAIAAAAAA=",
+            "AAAAAAAAAAAAAAAaZ2V0X3BsYXRmb3JtX2ZlZV9yZWNpcGllbnQAAAAAAAAAAAABAAAD6AAAABM=",
+            "AAAAAAAAAG01LiBIaXRvIDIgKEludGVybmFjaW9uYWwpOiBOYWNpb25hbGl6YWNpw7NuIHZlcmlmaWNhZGEgZW4gUmVjaW50byBGaXNjYWwgQm9saXZpYW5vIChESU0gLyBTVU1BKSAtPiBMaWJlcmEgMjUlAAAAAAAAGnZlcmlmeV9jdXN0b21zX2FuZF9yZWxlYXNlAAAAAAACAAAAAAAAAAhiYXRjaF9pZAAAAAYAAAAAAAAADGRpbV9kb2NfaGFzaAAAA+4AAAAgAAAAAA==",
+            "AAAAAAAAAGU0LiBIaXRvIDEgKEludGVybmFjaW9uYWwpOiBDb25maXJtYWNpw7NuIGRlIEVtYmFycXVlIChCaWxsIG9mIExhZGluZykgeSBsaWJlcmFjacOzbiBkZWwgVHJhbW8gMSAoNjAlKQAAAAAAABt2ZXJpZnlfc2hpcG1lbnRfYW5kX3JlbGVhc2UAAAAAAgAAAAAAAAAIYmF0Y2hfaWQAAAAGAAAAAAAAAAtibF9kb2NfaGFzaAAAAAPuAAAAIAAAAAA="]), options);
+        this.options = options;
+    }
+    fromJSON = {
+        get_batch: (this.txFromJSON),
+        initialize: (this.txFromJSON),
+        slash_broker: (this.txFromJSON),
+        get_buyer_pos: (this.txFromJSON),
+        join_open_batch: (this.txFromJSON),
+        confirm_delivery: (this.txFromJSON),
+        get_admin_oracle: (this.txFromJSON),
+        lock_broker_bond: (this.txFromJSON),
+        create_open_batch: (this.txFromJSON),
+        get_broker_profile: (this.txFromJSON),
+        claim_expired_refund: (this.txFromJSON),
+        get_platform_fee_bps: (this.txFromJSON),
+        assign_broker_and_bond: (this.txFromJSON),
+        verify_domestic_dispatch: (this.txFromJSON),
+        get_platform_fee_recipient: (this.txFromJSON),
+        verify_customs_and_release: (this.txFromJSON),
+        verify_shipment_and_release: (this.txFromJSON)
+    };
+}
