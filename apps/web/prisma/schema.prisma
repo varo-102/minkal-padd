@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BatchMetadata {
+  id               Int             @id @default(autoincrement())
+  batchId          BigInt          @unique
+  title            String
+  description      String
+  sku              String
+  nandinaCode      String?
+  category         String
+  imageUrl         String
+  factoryUrl       String?
+  originCity       String
+  targetDepartment String
+  isDomestic       Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  bids             BrokerBid[]
+  documents        BatchDocument[]
+}
+
+model BrokerBid {
+  id                   String        @id @default(cuid())
+  batchId              BigInt
+  batch                BatchMetadata @relation(fields: [batchId], references: [batchId], onDelete: Cascade)
+  brokerAddress        String
+  brokerName           String
+  freightCostUsdc      Float
+  customsClearanceUsdc Float
+  domesticDeliveryUsdc Float
+  totalQuoteUsdc       Float
+  estimatedDays        Int
+  bondRequired         Float
+  status               String        @default("PENDING")
+  createdAt            DateTime      @default(now())
+}
+
+model BatchDocument {
+  id         String        @id @default(cuid())
+  batchId    BigInt
+  batch      BatchMetadata @relation(fields: [batchId], references: [batchId], onDelete: Cascade)
+  docType    String        // BILL_OF_LADING, DIM_SUMA, COMMERCIAL_INVOICE, WAYBILL
+  fileName   String
+  fileUrl    String
+  fileHash   String        // 64-character SHA-256 hex string
+  uploadedBy String
+  verified   Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+}
